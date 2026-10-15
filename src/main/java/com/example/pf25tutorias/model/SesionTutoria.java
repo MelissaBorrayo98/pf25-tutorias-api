@@ -11,40 +11,47 @@ public class SesionTutoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;
 
-    @Column(name = "duracion_horas", nullable = false)
-    private Integer duracionHoras;
+    @Column(name = "duracion_horas")
+    private Double duracion;
 
-    @Column(nullable = false, length = 100)
-    private String materia;
+    @Column(name = "materia")
+    private String materiaNombre; // Esta línea soluciona el error de la columna vacía
 
-    @Column(nullable = false, length = 50)
+    private String estudiante;
     private String estado;
+    private Double costoTotal;
 
     @ManyToOne
-    @JoinColumn(name = "tutor_id", nullable = false)
-    private Tutor tutor;
+    @JoinColumn(name = "materia_id", nullable = false)
+    private Materia materia;
 
-    // Constructores, Getters y Setters
+    // Constructor vacío
     public SesionTutoria() {}
 
+    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public LocalDateTime getFechaHora() { return fechaHora; }
     public void setFechaHora(LocalDateTime fechaHora) { this.fechaHora = fechaHora; }
 
-    public Integer getDuracionHoras() { return duracionHoras; }
-    public void setDuracionHoras(Integer duracionHoras) { this.duracionHoras = duracionHoras; }
+    public Double getDuracion() { return duracion; }
+    public void setDuracion(Double duracion) { this.duracion = duracion; }
 
-    public String getMateria() { return materia; }
-    public void setMateria(String materia) { this.materia = materia; }
+    public String getMateriaNombre() { return materiaNombre; }
+    public void setMateriaNombre(String materiaNombre) { this.materiaNombre = materiaNombre; }
+
+    public String getEstudiante() { return estudiante; }
+    public void setEstudiante(String estudiante) { this.estudiante = estudiante; }
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 
-    public Tutor getTutor() { return tutor; }
-    public void setTutor(Tutor tutor) { this.tutor = tutor; }
+    public Double getCostoTotal() { return costoTotal; }
+    public void setCostoTotal(Double costoTotal) { this.costoTotal = costoTotal; }
+
+    public Materia getMateria() { return materia; }
+    public void setMateria(Materia materia) { this.materia = materia; }
 }
