@@ -1,4 +1,4 @@
-# PF-25 — Sesiones de Tutoría Académica (Avance 1)
+# PF-25 — Sesiones de Tutoría Académica 
 
 **Estudiante:** Melissa Betzabeh Borrayo Mejía  
 **Carné:** 9941-25-28099  
