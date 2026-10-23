@@ -1,6 +1,7 @@
 package com.example.pf25tutorias.controller;
 
-import com.example.pf25tutorias.model.SesionTutoria;
+import com.example.pf25tutorias.dto.SesionTutoriaRequestDTO;
+import com.example.pf25tutorias.dto.SesionTutoriaResponseDTO;
 import com.example.pf25tutorias.service.SesionTutoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,15 +21,15 @@ public class SesionTutoriaController {
 
     // 1. Listar todas las sesiones
     @GetMapping
-    public ResponseEntity<List<SesionTutoria>> listarTodas() {
+    public ResponseEntity<List<SesionTutoriaResponseDTO>> listarTodas() {
         return ResponseEntity.ok(sesionService.listarTodas());
     }
 
-    // 2. Crear una nueva sesión asociada a una materia (valida horarios y calcula costo)
+    // 2. Crear una nueva sesión usando DTO
     @PostMapping("/materia/{materiaId}")
-    public ResponseEntity<?> crearSesion(@PathVariable Long materiaId, @RequestBody SesionTutoria sesion) {
+    public ResponseEntity<?> crearSesion(@PathVariable Long materiaId, @RequestBody SesionTutoriaRequestDTO requestDTO) {
         try {
-            SesionTutoria nuevaSesion = sesionService.crearSesion(materiaId, sesion);
+            SesionTutoriaResponseDTO nuevaSesion = sesionService.crearSesion(materiaId, requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaSesion);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -37,25 +38,25 @@ public class SesionTutoriaController {
 
     // 3. Consultar sesiones por materia
     @GetMapping("/materia/{materiaId}")
-    public ResponseEntity<List<SesionTutoria>> obtenerPorMateria(@PathVariable Long materiaId) {
+    public ResponseEntity<List<SesionTutoriaResponseDTO>> obtenerPorMateria(@PathVariable Long materiaId) {
         return ResponseEntity.ok(sesionService.obtenerPorMateria(materiaId));
     }
 
     // 4. Consultar sesiones pendientes
     @GetMapping("/pendientes")
-    public ResponseEntity<List<SesionTutoria>> obtenerPendientes() {
+    public ResponseEntity<List<SesionTutoriaResponseDTO>> obtenerPendientes() {
         return ResponseEntity.ok(sesionService.obtenerPendientes());
     }
 
     // 5. Consultar sesiones por rango de fecha/hora
     @GetMapping("/fecha")
-    public ResponseEntity<List<SesionTutoria>> obtenerPorFecha(
+    public ResponseEntity<List<SesionTutoriaResponseDTO>> obtenerPorFecha(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin) {
         return ResponseEntity.ok(sesionService.obtenerPorFecha(inicio, fin));
     }
 
-    // 6. Indicador: Total esperado por día (en un rango de fecha/hora)
+    // 6. Indicador: Total esperado por día
     @GetMapping("/total-dia")
     public ResponseEntity<Double> calcularTotalDia(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -69,5 +70,15 @@ public class SesionTutoriaController {
     public ResponseEntity<Void> eliminarSesion(@PathVariable Long id) {
         sesionService.eliminarSesion(id);
         return ResponseEntity.noContent().build();
+    }
+    // 8. Actualizar una sesión existente
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarSesion(@PathVariable Long id, @RequestBody SesionTutoriaRequestDTO requestDTO) {
+        try {
+            SesionTutoriaResponseDTO sesionActualizada = sesionService.actualizarSesion(id, requestDTO);
+            return ResponseEntity.ok(sesionActualizada);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

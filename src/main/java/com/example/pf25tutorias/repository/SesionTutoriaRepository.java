@@ -15,4 +15,7 @@ public interface SesionTutoriaRepository extends JpaRepository<SesionTutoria, Lo
     List<SesionTutoria> findByEstado(String estado);
 
     List<SesionTutoria> findByFechaHoraBetween(LocalDateTime inicio, LocalDateTime fin);
+
+    // Validación para evitar sesiones duplicadas en la misma fecha y hora
+    boolean existsByFechaHora(LocalDateTime fechaHora);
 }
