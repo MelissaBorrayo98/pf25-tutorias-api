@@ -1,0 +1,164 @@
+{
+  "info": {
+    "_postman_id": "aa4725d3-f453-486e-b8ea-308759b8189f",
+    "name": "PF-25 Tutorías",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58807533",
+    "_collection_link": "https://go.postman.co/collection/58807533-aa4725d3-f453-486e-b8ea-308759b8189f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "consultar materias",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/materias",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "materias"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Crear sesion",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"fechaHora\": \"2026-11-10T16:00:00\",\r\n  \"duracion\": 2.0,\r\n  \"estudiante\": \"Melissa Borrayo\",\r\n  \"estado\": \"PENDIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/sesiones/materia/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "sesiones",
+            "materia",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Crear Sesión - Error Validación",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"fechaHora\": \"2026-11-10T16:00:00\",\r\n  \"duracion\": -1.5,\r\n  \"estudiante\": \"Melissa Borrayo\",\r\n  \"estado\": \"PENDIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/sesiones/materia/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "sesiones",
+            "materia",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "actualizando dptos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/materias",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "materias"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "actualizacion de sesion",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"fechaHora\": \"2026-11-05T10:00:00\",\r\n  \"duracion\": 3.0,\r\n  \"estudiante\": \"Juan Pérez\",\r\n  \"estado\": \"COMPLETADA\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/sesiones/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "sesiones",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ELIMINACION DE SESION",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/sesiones/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "sesiones",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
