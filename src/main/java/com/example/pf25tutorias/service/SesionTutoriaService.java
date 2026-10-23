@@ -23,20 +23,20 @@ public class SesionTutoriaService {
     @Autowired
     private MateriaRepository materiaRepository;
 
-    // 1. Listar todas
+    // 1. Listar todas las sesiones
     public List<SesionTutoriaResponseDTO> listarTodas() {
         return sesionRepository.findAll().stream()
                 .map(this::convertirAResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    // Buscar entidad pura por ID (Lanza NoSuchElementException -> Activa HTTP 404)
+    // Buscar entidad pura por ID
     public SesionTutoria buscarEntidadPorId(Long id) {
         return sesionRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("La sesión con ID " + id + " no fue encontrada."));
     }
 
-    // 2. Crear sesión usando DTO y Materia ID
+    // 2. Crear sesión usando DTO y Materia ID (Con cálculo automático de costo total)
     public SesionTutoriaResponseDTO crearSesion(Long materiaId, SesionTutoriaRequestDTO requestDTO) {
         Materia materia = materiaRepository.findById(materiaId)
                 .orElseThrow(() -> new NoSuchElementException("La materia con ID " + materiaId + " no fue encontrada."));
@@ -47,6 +47,19 @@ public class SesionTutoriaService {
         sesion.setEstudiante(requestDTO.getEstudiante());
         sesion.setEstado(requestDTO.getEstado());
         sesion.setMateria(materia);
+
+        // Asignar el nombre de la materia a la entidad
+        sesion.setMateriaNombre(materia.getNombre());
+
+        // CÁLCULO AUTOMÁTICO: tarifaHora * Duración en horas
+        Double tarifaHora = materia.getTarifaHora(); // Usando el método correcto de tu modelo Materia
+        Double duracionHoras = requestDTO.getDuracion();
+
+        if (tarifaHora != null && duracionHoras != null) {
+            sesion.setCostoTotal(tarifaHora * duracionHoras);
+        } else {
+            sesion.setCostoTotal(0.0);
+        }
 
         SesionTutoria guardada = sesionRepository.save(sesion);
         return convertirAResponseDTO(guardada);
@@ -86,7 +99,7 @@ public class SesionTutoriaService {
                 .sum();
     }
 
-    // 7. Eliminar sesión (Valida existencia -> HTTP 404)
+    // 7. Eliminar sesión
     public void eliminarSesion(Long id) {
         if (!sesionRepository.existsById(id)) {
             throw new NoSuchElementException("No se puede eliminar. La sesión con ID " + id + " no existe.");
@@ -94,14 +107,22 @@ public class SesionTutoriaService {
         sesionRepository.deleteById(id);
     }
 
-    // 8. Actualizar sesión (Valida existencia -> HTTP 404)
+    // 8. Actualizar sesión (Con recálculo automático de costo)
     public SesionTutoriaResponseDTO actualizarSesion(Long id, SesionTutoriaRequestDTO requestDTO) {
-        SesionTutoria sesionExistente = buscarEntidadPorId(id); // Lanza NoSuchElementException si no existe -> 404
+        SesionTutoria sesionExistente = buscarEntidadPorId(id);
 
         sesionExistente.setFechaHora(requestDTO.getFechaHora());
         sesionExistente.setDuracion(requestDTO.getDuracion());
         sesionExistente.setEstudiante(requestDTO.getEstudiante());
         sesionExistente.setEstado(requestDTO.getEstado());
+
+        // Recalcular costo usando tarifaHora si se modifica la duración o la materia
+        if (sesionExistente.getMateria() != null && requestDTO.getDuracion() != null) {
+            Double tarifaHora = sesionExistente.getMateria().getTarifaHora();
+            if (tarifaHora != null) {
+                sesionExistente.setCostoTotal(tarifaHora * requestDTO.getDuracion());
+            }
+        }
 
         SesionTutoria actualizada = sesionRepository.save(sesionExistente);
         return convertirAResponseDTO(actualizada);
@@ -116,6 +137,7 @@ public class SesionTutoriaService {
         dto.setEstudiante(sesion.getEstudiante());
         dto.setEstado(sesion.getEstado());
         dto.setCostoTotal(sesion.getCostoTotal());
+        dto.setMateriaNombre(sesion.getMateriaNombre());
         return dto;
     }
 }

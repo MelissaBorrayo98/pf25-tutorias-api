@@ -3,14 +3,13 @@ package com.example.pf25tutorias.dto;
 import java.time.LocalDateTime;
 
 public class SesionTutoriaResponseDTO {
-
     private Long id;
     private LocalDateTime fechaHora;
     private Double duracion;
     private String estudiante;
     private String estado;
     private Double costoTotal;
-    private String materiaNombre;
+    private String materiaNombre; // Declarada una sola vez
 
     // Getters y Setters
     public Long getId() {

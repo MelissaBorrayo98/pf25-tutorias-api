@@ -3,11 +3,11 @@ package com.example.pf25tutorias.dto;
 import java.time.LocalDateTime;
 
 public class SesionTutoriaRequestDTO {
-
     private LocalDateTime fechaHora;
     private Double duracion;
     private String estudiante;
     private String estado;
+    private Double costoTotal; // <-- Campo necesario para recibir el costo
 
     // Getters y Setters
     public LocalDateTime getFechaHora() {
@@ -40,5 +40,13 @@ public class SesionTutoriaRequestDTO {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Double getCostoTotal() {
+        return costoTotal;
+    }
+
+    public void setCostoTotal(Double costoTotal) {
+        this.costoTotal = costoTotal;
     }
 }

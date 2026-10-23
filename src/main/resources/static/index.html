@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal de Sesiones de Tutoría Académica</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="main-container">
+    <!-- Cabecera con Logo Institucional -->
+    <header class="app-header">
+        <img src="logo.png" alt="Logo Institucional" class="school-logo" onerror="this.src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=100&auto=format&fit=crop&q=60'; this.onerror='';">
+        <div class="header-titles">
+            <h1>Portal de Sesiones de Tutoría Académica</h1>
+            <p class="subtitle">Universidad Mariano Gálvez | Sede Portales</p>
+        </div>
+    </header>
+
+    <div class="content-grid">
+        <!-- Formulario de Registro -->
+        <section class="card form-card">
+            <h2>📚 Registrar Nueva Tutoría</h2>
+            <form id="tutoriasForm">
+                <div class="input-group">
+                    <label for="materiaId">ID de Materia</label>
+                    <input type="text" id="materiaId" placeholder="Ej. 1" required>
+                </div>
+                <div class="input-group">
+                    <label for="estudiante">Nombre del Estudiante</label>
+                    <input type="text" id="estudiante" placeholder="Ej. María Gómez" required>
+                </div>
+                <div class="input-group">
+                    <label for="fecha">Fecha y Hora</label>
+                    <input type="datetime-local" id="fecha" required>
+                </div>
+                <div class="input-group">
+                    <label for="duracion">Duración (horas)</label>
+                    <input type="number" step="0.5" id="duracion" placeholder="Ej. 1.5" required>
+                </div>
+                <div class="input-group">
+                    <label for="estado">Estado</label>
+                    <input type="text" id="estado" value="PENDIENTE" required>
+                </div>
+                <div class="input-group">
+                    <label for="costo">Costo Total (Q)</label>
+                    <input type="number" id="costo" placeholder="Ej. 90" required>
+                </div>
+                <div class="input-group">
+                    <label for="detalles">Detalles de la Tutoría</label>
+                    <input type="text" id="detalles" placeholder="Tema tratado" required>
+                </div>
+                <button type="submit" class="btn-primary">Guardar Tutoría</button>
+            </form>
+        </section>
+
+        <!-- Listado de Sesiones -->
+        <section class="card table-card">
+            <div class="table-header">
+                <h2>📋 Listado de Sesiones Registradas</h2>
+                <button id="cargarBtn" type="button" class="btn-secondary">Actualizar Lista</button>
+            </div>
+            <div class="table-responsive">
+                <table id="tablaTutorias">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha y Hora</th>
+                        <th>Materia</th>
+                        <th>Estudiante</th>
+                        <th>Estado</th>
+                        <th>Costo</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Se llena dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
