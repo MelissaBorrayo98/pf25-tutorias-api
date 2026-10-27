@@ -9,108 +9,141 @@
 ---
 
 ## Descripción del Proyecto
-El sistema permite administrar de forma eficiente la programación, control y seguimiento de sesiones de tutoría académica asociadas a distintas materias. Cuenta con un **backend en Spring Boot** y una **interfaz gráfica web (Frontend)** integrada, resolviendo la necesidad de evitar cruces de horarios, calcular automáticamente los costos totales en función de la tarifa por hora de cada materia, gestionar estados operativos y proveer indicadores financieros y reportes.
+El sistema administra la programación, el control y el seguimiento de sesiones de tutoría académica asociadas a distintas materias. Evita cruces de horarios, calcula automáticamente el costo total de cada sesión a partir de la tarifa por hora de la materia, gestiona estados operativos y ofrece un indicador del total esperado de ingresos por rango de fechas.
 
----
+Incluye un **backend REST en Spring Boot** y una **interfaz web** (HTML, CSS y JavaScript) servida por la misma aplicación.
 
 ## Tecnologías Utilizadas
 - **Lenguaje:** Java 17+
-- **Framework:** Spring Boot 3.x
-- **Persistencia:** Spring Data JPA / Hibernate
+- **Framework:** Spring Boot 3.x (Web, Data JPA, Validation)
 - **Base de datos:** PostgreSQL
 - **Frontend:** HTML5, CSS3, JavaScript (Vanilla JS)
-- **Control de versiones:** Git y GitHub (MelissaBorrayo98)
-- **Herramientas de gestión:** Maven, IntelliJ IDEA
-
----
+- **Pruebas:** JUnit 5, Mockito, MockMvc
+- **Herramientas:** Maven, Git y GitHub (MelissaBorrayo98), Postman, IntelliJ IDEA
 
 ## Estructura General del Sistema
-El proyecto sigue una arquitectura en capas estándar de Spring Boot:
-```text
+```
 src/main/java/com/example/pf25tutorias/
-├── controller/   # Controladores REST que exponen los endpoints de la API
-├── dto/          # Objetos de Transferencia de Datos (Request y Response)
-├── exception/    # Manejador global de excepciones y errores
-├── model/        # Entidades JPA mapeadas a las tablas de la base de datos
-├── repository/   # Interfaces de Spring Data JPA para acceso a datos
-└── service/      # Lógica de negocio, reglas operativas y cálculos automáticos
-```
-Y la estructura de archivos estáticos para la interfaz visual:
-```text
-src/main/resources/static/
-├── index.html    # Panel visual interactivo de la aplicación
-├── app.js        # Lógica de consumo de la API desde el navegador
-└── style.css     # Estilos y diseño responsivo del dashboard
+├── controller/   # Controladores REST (endpoints)
+├── dto/          # DTO de entrada/salida con validaciones (@Valid)
+├── exception/    # Manejador global de errores (404, 400, 409)
+├── model/        # Entidades JPA: Materia y SesionTutoria
+├── repository/   # Interfaces Spring Data JPA
+└── service/      # Lógica de negocio y reglas operativas
+src/main/resources/static/   # Frontend: index.html, app.js, style.css
+src/test/java/...            # Pruebas unitarias y de la capa web
+DATABASE/                    # Scripts SQL
+EVIDENCIAS/                  # Evidencias y colección de Postman
 ```
 
----
-
-## Requisitos para Ejecutar el Proyecto
-1. Java Development Kit (JDK) 17 o superior instalado.
-2. Apache Maven instalado y configurado en las variables de entorno.
-3. PostgreSQL instalado y ejecutándose localmente.
+## Requisitos
+1. JDK 17 o superior.
+2. Apache Maven (o el wrapper `mvnw` incluido).
+3. PostgreSQL en ejecución.
 4. Un IDE compatible (IntelliJ IDEA recomendado).
 
----
-
 ## Configuración de PostgreSQL
-1. Abre tu gestor de base de datos PostgreSQL y crea la base de datos:
+1. Crear la base de datos (conectado a `postgres`):
    ```sql
-   CREATE DATABASE pf25tutorias;
+   CREATE DATABASE pf25_tutorias_db;
    ```
-2. Configura tus credenciales en el archivo `src/main/resources/application.properties`:
+   (o ejecutar `DATABASE/01_crear_base_de_datos.sql`)
+2. Conectado a `pf25_tutorias_db`, ejecutar `DATABASE/02_tablas_y_datos_de_prueba.sql`. Crea las tablas `materia` y `sesion_tutoria` y carga datos de prueba. **Borra y recrea las tablas.**
+3. Indicar las credenciales en `src/main/resources/application.properties`, o definir las variables de entorno `DB_USER` y `DB_PASSWORD`:
    ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/pf25tutorias
-   spring.datasource.username=tu_usuario
-   spring.datasource.password=tu_contraseña
+   spring.datasource.url=jdbc:postgresql://localhost:5432/pf25_tutorias_db
+   spring.datasource.username=${DB_USER:postgres}
+   spring.datasource.password=${DB_PASSWORD:cambiar_password}
    spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
-   spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
    ```
 
----
+## Cómo iniciar la aplicación
+```
+mvn spring-boot:run
+```
+El servidor inicia en `http://localhost:8080`.
 
-## Instrucciones para Iniciar la Aplicación
-1. Clona o abre el repositorio del proyecto en tu IDE.
-2. Ejecuta el siguiente comando con Maven para compilar y arrancar la aplicación:
-   ```bash
-   mvn spring-boot:run
-   ```
-3. El servidor se iniciará por defecto en el puerto `8080`.
+- **Interfaz web:** http://localhost:8080/index.html
+- **API REST:** `http://localhost:8080/api/...`
 
----
-
-## Accesos y Endpoints del Sistema
-
-### 1. Interfaz Web (Frontend)
-Una vez encendida la aplicación, puedes acceder al panel interactivo directamente desde tu navegador:
-- **Dashboard Web:** [http://localhost:8080/index.html](http://localhost:8080/index.html)
-
-### 2. API REST (Endpoints)
-Las peticiones se realizan hacia la ruta base `http://localhost:8080/api/...`:
-
-- **Materias (`/api/materias`)**
-  - `GET /api/materias`: Lista todas las materias registradas.
-  - `GET /api/materias/{id}`: Consulta una materia específica por su ID.
-  - `POST /api/materias`: Registra una nueva materia.
-  - `PUT /api/materias/{id}`: Actualiza la información de una materia.
-  - `DELETE /api/materias/{id}`: Elimina una materia.
-
-- **Sesiones de Tutoría (`/api/sesiones`)**
-  - `GET /api/sesiones`: Lista todas las sesiones programadas.
-  - `GET /api/sesiones/{id}`: Consulta una sesión específica por su ID.
-  - `POST /api/sesiones/materia/{materiaId}`: Registra una nueva sesión asociada a una materia, extrayendo el nombre y calculando costos.
-  - `GET /api/sesiones/materia/{materiaId}`: Filtro - Obtiene sesiones por materia.
-  - `GET /api/sesiones/pendientes`: Filtro - Consulta sesiones con estado "PENDIENTE".
-  - `GET /api/sesiones/fecha?inicio=...&fin=...`: Filtro - Consulta sesiones dentro de un rango de fechas.
-  - `GET /api/sesiones/total-dia?inicio=...&fin=...`: Indicador - Calcula el total esperado de ingresos en un rango de fecha/hora.
-  - `DELETE /api/sesiones/{id}`: Elimina una sesión de tutoría.
+## Cómo ejecutar las pruebas
+```
+mvn test
+```
+Las pruebas unitarias y de la capa web no necesitan base de datos. La prueba `contextLoads` (arranque completo) está desactivada con `@Disabled` porque sí la necesita.
 
 ---
 
-## Reglas Principales del Negocio
-1. **Validación de Duración:** La duración de cada sesión debe ser mayor a 0 horas.
-2. **Prevención de Choque de Horarios:** Valida que no exista otra sesión programada exactamente en la misma fecha y hora.
-3. **Cálculo Automático de Costos:** El `costoTotal` se calcula automáticamente multiplicando la duración en horas por la `tarifaHora` definida en la materia seleccionada.
-4. **Mapeo de Nombre de Materia:** Asigna y persiste automáticamente el nombre de la materia en los registros de las sesiones para su correcta visualización tanto en backend como en frontend.
-5. **Estado por Defecto:** Si no se especifica un estado al registrar una sesión, el sistema asigna por defecto "PENDIENTE".
+## Endpoints
+
+### Materias (`/api/materias`)
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/materias` | Lista todas las materias (con sus sesiones) |
+| GET | `/api/materias/{id}` | Consulta una materia |
+| POST | `/api/materias` | Registra una materia (validada con DTO) |
+| PUT | `/api/materias/{id}` | Actualiza una materia |
+| DELETE | `/api/materias/{id}` | Elimina una materia y sus sesiones |
+
+Ejemplo de cuerpo (POST/PUT):
+```json
+{ "nombre": "Bases de Datos I", "descripcion": "Modelado relacional", "tarifaHora": 200.0 }
+```
+
+### Sesiones de tutoría (`/api/sesiones`)
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/sesiones` | Lista todas las sesiones |
+| GET | `/api/sesiones/{id}` | Consulta una sesión |
+| POST | `/api/sesiones/materia/{materiaId}` | Registra una sesión de una materia |
+| PUT | `/api/sesiones/{id}` | Actualiza una sesión (recalcula el costo) |
+| DELETE | `/api/sesiones/{id}` | Elimina una sesión |
+| GET | `/api/sesiones/materia/{materiaId}` | Filtro: sesiones de una materia |
+| GET | `/api/sesiones/pendientes` | Filtro: sesiones con estado PENDIENTE |
+| GET | `/api/sesiones/fecha?inicio=...&fin=...` | Filtro: sesiones en un rango de fecha y hora |
+| GET | `/api/sesiones/total-dia?inicio=...&fin=...` | Indicador: total esperado de ingresos en el rango |
+
+Fechas en formato ISO, por ejemplo `2026-11-10T16:00:00`.
+
+Ejemplo de cuerpo (POST/PUT). **No se envía el costo:** lo calcula el sistema.
+```json
+{
+  "fechaHora": "2026-11-10T16:00:00",
+  "duracion": 2.0,
+  "estudiante": "Juan Pérez",
+  "estado": "PENDIENTE"
+}
+```
+Respuesta (201 Created):
+```json
+{
+  "id": 4, "fechaHora": "2026-11-10T16:00:00", "duracion": 2.0,
+  "estudiante": "Juan Pérez", "estado": "PENDIENTE",
+  "costoTotal": 300.0, "materiaId": 1, "materiaNombre": "Matemáticas Discretas"
+}
+```
+Estados permitidos: `PENDIENTE`, `PROGRAMADA`, `CONFIRMADA`, `COMPLETADA`, `CANCELADA`.
+
+---
+
+## Reglas de Negocio
+1. **Duración mayor a 0:** `duracion` debe ser mayor a 0 horas (anotación `@Positive` en el DTO y validación en el servicio). Si no, responde `400`.
+2. **Sin choque de horarios:** no se permite otra sesión en la misma fecha y hora, tanto al crear como al actualizar. Si existe, responde `409`.
+3. **Cálculo automático del costo:** `costoTotal = duracion × tarifaHora` de la materia. El cliente no lo envía y se recalcula al actualizar.
+4. **Estado por defecto:** si no se indica estado al registrar, se asigna `PENDIENTE`.
+5. **Total esperado:** el indicador `total-dia` suma el costo de las sesiones del rango, sin contar las `CANCELADA`.
+6. **Nombre de materia único:** no se permiten dos materias con el mismo nombre (`409`).
+
+## Manejo de Errores
+Todas las respuestas de error usan el mismo formato:
+```json
+{ "status": 400, "error": "Los datos enviados no son válidos.", "errores": { "duracion": "La duración debe ser mayor a 0 horas." } }
+```
+| Código | Cuándo ocurre |
+|---|---|
+| 400 | Datos inválidos, JSON o fecha mal formados, rango de fechas invertido |
+| 404 | La sesión o la materia no existe |
+| 409 | Horario ocupado, nombre de materia duplicado o restricción de base de datos |
+
+## Pruebas con Postman
+La colección `EVIDENCIAS/PF-25_Tutorias_v2.postman_collection.json` incluye los casos correctos y los de error (duración negativa, horario duplicado, materia inexistente, sesión inexistente).
