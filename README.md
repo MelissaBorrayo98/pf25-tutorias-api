@@ -32,12 +32,12 @@ src/main/java/com/example/pf25tutorias/
 └── service/      # Lógica de negocio y reglas operativas
 src/main/resources/static/   # Frontend: index.html, app.js, style.css
 src/test/java/...            # Pruebas unitarias y de la capa web
-DATABASE/                    # Scripts SQL
+DATABASE/                    # Scripts SQL (01 crear base de datos, 02 tablas y datos de prueba)
 EVIDENCIAS/                  # Evidencias y colección de Postman
 ```
 
 ## Requisitos
-1. JDK 17 o superior.
+1. JDK 17 o superior (probado con JDK 17 y con JDK 25; el `pom.xml` ya configura las pruebas para JDK recientes).
 2. Apache Maven (o el wrapper `mvnw` incluido).
 3. PostgreSQL en ejecución.
 4. Un IDE compatible (IntelliJ IDEA recomendado).
@@ -48,7 +48,7 @@ EVIDENCIAS/                  # Evidencias y colección de Postman
    CREATE DATABASE pf25_tutorias_db;
    ```
    (o ejecutar `DATABASE/01_crear_base_de_datos.sql`)
-2. Conectado a `pf25_tutorias_db`, ejecutar `DATABASE/02_tablas_y_datos_de_prueba.sql`. Crea las tablas `materia` y `sesion_tutoria` y carga datos de prueba. **Borra y recrea las tablas.**
+2. Conectado a `pf25_tutorias_db`, ejecutar `DATABASE/02_tablas_y_datos_de_prueba.sql`. Crea las tablas `materia` (apoyo) y `sesion_tutoria` (principal), con sus restricciones, y carga **5 materias y 12 sesiones** de prueba, incluida una sesión cancelada que comparte horario con una activa. **Borra y recrea las tablas.**
 3. Indicar las credenciales en `src/main/resources/application.properties`, o definir las variables de entorno `DB_USER` y `DB_PASSWORD`:
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/pf25_tutorias_db
@@ -70,7 +70,7 @@ El servidor inicia en `http://localhost:8080`.
 ```
 mvn test
 ```
-Las pruebas unitarias y de la capa web no necesitan base de datos. La prueba `contextLoads` (arranque completo) está desactivada con `@Disabled` porque sí la necesita.
+Son 33 pruebas automáticas (servicio con Mockito, validaciones de los DTO y capa web con MockMvc) que no necesitan base de datos, incluidas las de la regla de sesiones canceladas y del cálculo con `BigDecimal`. La prueba `contextLoads` (arranque completo) está desactivada con `@Disabled` porque sí la necesita.
 
 ---
 
@@ -119,7 +119,7 @@ Respuesta (201 Created):
 {
   "id": 4, "fechaHora": "2026-11-10T16:00:00", "duracion": 2.0,
   "estudiante": "Juan Pérez", "estado": "PENDIENTE",
-  "costoTotal": 300.0, "materiaId": 1, "materiaNombre": "Matemáticas Discretas"
+  "costoTotal": 300.00, "materiaId": 1, "materiaNombre": "Matemáticas Discretas"
 }
 ```
 Estados permitidos: `PENDIENTE`, `PROGRAMADA`, `CONFIRMADA`, `COMPLETADA`, `CANCELADA`.
@@ -128,8 +128,8 @@ Estados permitidos: `PENDIENTE`, `PROGRAMADA`, `CONFIRMADA`, `COMPLETADA`, `CANC
 
 ## Reglas de Negocio
 1. **Duración mayor a 0:** `duracion` debe ser mayor a 0 horas (anotación `@Positive` en el DTO y validación en el servicio). Si no, responde `400`.
-2. **Sin choque de horarios:** no se permite otra sesión en la misma fecha y hora, tanto al crear como al actualizar. Si existe, responde `409`.
-3. **Cálculo automático del costo:** `costoTotal = duracion × tarifaHora` de la materia. El cliente no lo envía y se recalcula al actualizar.
+2. **Disponibilidad de horarios:** no puede haber dos sesiones **activas** en la misma fecha y hora, ni al crear ni al actualizar (`409`). Las sesiones **CANCELADAS liberan el horario**: no lo bloquean y se puede reservar de nuevo esa fecha y hora. Reactivar una cancelada cuyo horario ya fue tomado también responde `409`. La regla es la misma en Java (servicio) y en PostgreSQL (índice único parcial `WHERE estado <> 'CANCELADA'`).
+3. **Cálculo automático del costo:** `costoTotal = duracion × tarifaHora` de la materia. El cliente no lo envía y se recalcula al actualizar. Los importes usan `BigDecimal` en Java y `NUMERIC(10,2)` en PostgreSQL, redondeados a 2 decimales (HALF_UP); la tarifa admite como máximo 2 decimales.
 4. **Estado por defecto:** si no se indica estado al registrar, se asigna `PENDIENTE`.
 5. **Total esperado:** el indicador `total-dia` suma el costo de las sesiones del rango, sin contar las `CANCELADA`.
 6. **Nombre de materia único:** no se permiten dos materias con el mismo nombre (`409`).
@@ -143,7 +143,7 @@ Todas las respuestas de error usan el mismo formato:
 |---|---|
 | 400 | Datos inválidos, JSON o fecha mal formados, rango de fechas invertido |
 | 404 | La sesión o la materia no existe |
-| 409 | Horario ocupado, nombre de materia duplicado o restricción de base de datos |
+| 409 | Horario ocupado por una sesión activa, nombre de materia duplicado o restricción de base de datos |
 
 ## Pruebas con Postman
-La colección `EVIDENCIAS/PF-25_Tutorias_v2.postman_collection.json` incluye los casos correctos y los de error (duración negativa, horario duplicado, materia inexistente, sesión inexistente).
+La colección `EVIDENCIAS/PF-25_Tutorias_v2.postman_collection.json` incluye los casos correctos y los de error (duración negativa, horario duplicado, sesión cancelada que libera el horario, materia inexistente, sesión inexistente). Se ejecuta en orden sobre la base cargada con el script 02.
