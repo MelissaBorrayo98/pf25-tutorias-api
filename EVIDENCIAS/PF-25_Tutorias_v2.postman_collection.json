@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "PF-25 Tutorías v2",
-    "description": "Casos correctos y de error. Ejecutar en orden sobre la base creada con DATABASE/02_tablas_y_datos_de_prueba.sql. El código esperado está en el nombre de cada petición.",
+    "description": "Casos correctos y de error. Ejecutar en orden sobre la base creada con DATABASE/02_tablas_y_datos_de_prueba.sql (5 materias, 12 sesiones). El código esperado está en el nombre de cada petición.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -129,6 +129,40 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Materia X\",\n  \"descripcion\": \"x\",\n  \"tarifaHora\": -5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear materia - tarifa con 3 decimales (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/materias",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "materias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Materia Y\",\n  \"descripcion\": \"y\",\n  \"tarifaHora\": 150.555\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -499,6 +533,42 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Crear sesión CANCELADA en horario ocupado, no bloquea (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/sesiones/materia/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "sesiones",
+                "materia",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"2026-12-01T10:00:00\",\n  \"duracion\": 1.0,\n  \"estudiante\": \"Melissa Borrayo\",\n  \"estado\": \"CANCELADA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -779,7 +849,7 @@
           "response": []
         },
         {
-          "name": "Actualizar sesión - horario de otra sesión (409)",
+          "name": "Actualizar sesión - horario de otra sesión activa (409)",
           "request": {
             "method": "PUT",
             "header": [
@@ -803,7 +873,113 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fechaHora\": \"2026-11-06T14:00:00\",\n  \"duracion\": 1.0,\n  \"estudiante\": \"Juan Pérez\",\n  \"estado\": \"PENDIENTE\"\n}",
+              "raw": "{\n  \"fechaHora\": \"2026-11-05T14:00:00\",\n  \"duracion\": 1.0,\n  \"estudiante\": \"Juan Pérez\",\n  \"estado\": \"PENDIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar sesión 2 (200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/sesiones/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "sesiones",
+                "2"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"2026-11-05T14:00:00\",\n  \"duracion\": 1.5,\n  \"estudiante\": \"María Gómez\",\n  \"estado\": \"CANCELADA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear sesión en el horario liberado por la cancelada (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/sesiones/materia/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "sesiones",
+                "materia",
+                "2"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"2026-11-05T14:00:00\",\n  \"duracion\": 1.0,\n  \"estudiante\": \"Nuevo Estudiante\",\n  \"estado\": \"PENDIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivar sesión cancelada cuyo horario fue tomado (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/sesiones/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "sesiones",
+                "2"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"2026-11-05T14:00:00\",\n  \"duracion\": 1.5,\n  \"estudiante\": \"María Gómez\",\n  \"estado\": \"PENDIENTE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
